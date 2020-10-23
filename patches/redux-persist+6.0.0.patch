@@ -1,0 +1,12 @@
+diff --git a/node_modules/redux-persist/types/types.d.ts b/node_modules/redux-persist/types/types.d.ts
+index b3733bc..65260a3 100644
+--- a/node_modules/redux-persist/types/types.d.ts
++++ b/node_modules/redux-persist/types/types.d.ts
+@@ -49,6 +49,7 @@ declare module "redux-persist/es/types" {
+ 
+   interface PersistorOptions {
+     enhancer?: StoreEnhancer<any>;
++    manualPersist?: boolean;
+   }
+ 
+   interface Storage {
