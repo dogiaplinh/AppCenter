@@ -3,8 +3,11 @@ import { createStore } from "redux";
 import { PersistConfig, persistReducer, persistStore } from "redux-persist";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import { rootReducer } from "./reducers";
+import { UserState } from "./reducers/userReducer";
 
-export type AllState = {};
+export type AllState = {
+  user: UserState;
+};
 
 const persistConfig: PersistConfig<AllState> = {
   key: "root",
