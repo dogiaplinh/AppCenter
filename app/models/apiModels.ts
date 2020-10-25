@@ -52,15 +52,16 @@ export type VersionsResult = {
   total: number;
 };
 
-export type CountItem = {
+export type DateTimeItem = {
   count: number;
   datetime: string;
+  previous_count?: number;
 };
 
 export type ActiveDeviceCounts = {
-  daily: CountItem[];
-  weekly: CountItem[];
-  monthly: CountItem[];
+  daily?: DateTimeItem[];
+  weekly?: DateTimeItem[];
+  monthly?: DateTimeItem[];
 };
 
 export type ModelItem = {
@@ -71,4 +72,15 @@ export type ModelItem = {
 export type ModelsResult = {
   total: number;
   models: ModelItem[];
+};
+
+export type OsItem = {
+  os_name?: string;
+  count: number;
+  previous_count?: number;
+};
+
+export type OsResult = {
+  total: number;
+  oses: OsItem[];
 };

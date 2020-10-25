@@ -2,11 +2,13 @@ import {
   ActiveDeviceCounts,
   AppItem,
   ModelsResult,
+  OsResult,
   User,
   VersionsResult,
 } from "../models/ApiModels";
 import qs from "qs";
 import moment from "moment";
+import { Constants } from "../assets";
 
 class ApiClient {
   private apiToken: string;
@@ -21,7 +23,6 @@ class ApiClient {
 
   private async callApi<T>(url: string, queryString?: Record<string, string | number>): Promise<T> {
     const q = queryString ? "?" + qs.stringify(queryString, { skipNulls: true }) : "";
-    console.log(url + q);
     const response = await fetch(url + q, {
       headers: {
         ["X-API-Token"]: this.apiToken,
@@ -50,7 +51,7 @@ class ApiClient {
       {
         start: moment(startDate).format("YYYY-MM-DD"),
         end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit,
+        $top: limit || Constants.DEFAULT_MAX_RESULTS,
       },
     );
   }
@@ -67,7 +68,7 @@ class ApiClient {
       {
         start: moment(startDate).format("YYYY-MM-DD"),
         end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit,
+        $top: limit || Constants.DEFAULT_MAX_RESULTS,
       },
     );
   }
@@ -84,7 +85,24 @@ class ApiClient {
       {
         start: moment(startDate).format("YYYY-MM-DD"),
         end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit,
+        $top: limit || Constants.DEFAULT_MAX_RESULTS,
+      },
+    );
+  }
+
+  async getOSes(
+    username: string,
+    appName: string,
+    startDate: Date,
+    endDate?: Date,
+    limit?: number,
+  ) {
+    return this.callApi<OsResult>(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/oses`,
+      {
+        start: moment(startDate).format("YYYY-MM-DD"),
+        end: endDate && moment(endDate).format("YYYY-MM-DD"),
+        $top: limit || Constants.DEFAULT_MAX_RESULTS,
       },
     );
   }

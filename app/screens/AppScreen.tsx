@@ -8,6 +8,11 @@ import apiClient from "../utils/ApiClient";
 import { StackParamList } from "../models/ParamList";
 import { AllState } from "../store";
 import { dateBefore } from "../utils/DateUtils";
+import { ActiveDeviceCounts, VersionsResult } from "../models/ApiModels";
+import ActiveDeviceChart from "../components/ActiveDeviceChart";
+import VersionPieChart from "../components/VersionPieChart";
+
+const DayRange = 14;
 
 type Props = {
   navigation: StackNavigationProp<StackParamList, "App">;
@@ -16,16 +21,18 @@ type Props = {
 const AppScreen = ({ navigation, route }: Props) => {
   const app = route.params.app;
   const [latestVersion, setLatestVersion] = useState({ value: "", rate: 0 });
-  const [activeDevice, setActiveDevice] = useState({ daily: 0, weekly: 0, monthly: 0 });
+  const [versions, setVersions] = useState<VersionsResult>(undefined);
+  const [activeDevices, setActiveDevices] = useState<ActiveDeviceCounts>(undefined);
+  const now = new Date();
   useEffect(() => {
     (async () => {
-      const now = new Date();
       const versionList = await apiClient.getVersions(
         app.owner.name,
         app.name,
-        dateBefore(now, 7),
-        dateBefore(now, 1),
+        dateBefore(now, DayRange),
+        dateBefore(now, 0),
       );
+      setVersions(versionList);
       if (versionList?.versions?.length > 0) {
         const lastItem = versionList.versions[versionList.versions.length - 1];
         setLatestVersion({
@@ -33,70 +40,73 @@ const AppScreen = ({ navigation, route }: Props) => {
           rate: (lastItem.count / versionList.total) * 100,
         });
       }
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
       const activeDeviceCounts = await apiClient.getActiveDeviceCounts(
         app.owner.name,
         app.name,
-        dateBefore(now, 7),
-        dateBefore(now, 1),
+        dateBefore(now, DayRange),
+        dateBefore(now, 0),
       );
-      if (activeDeviceCounts?.daily?.length > 0) {
-        const lastIndex = activeDeviceCounts.daily.length - 1;
-        setActiveDevice({
-          weekly: activeDeviceCounts.weekly[lastIndex].count,
-          daily: activeDeviceCounts.daily[lastIndex].count,
-          monthly: activeDeviceCounts.monthly[lastIndex].count,
-        });
-      }
+      setActiveDevices(activeDeviceCounts);
     })();
   }, []);
   const goModelStats = useCallback(async () => {
     const now = new Date();
-    const models = await apiClient.getModels(app.owner.name, app.name, dateBefore(now, 7));
+    const models = await apiClient.getModels(app.owner.name, app.name, dateBefore(now, DayRange));
     navigation.push("GridStats", {
       title: "Models",
       data: { total: models.total, values: models.models },
       labelField: "model_name",
     });
   }, []);
+  const goOsStats = useCallback(async () => {
+    const now = new Date();
+    const oses = await apiClient.getOSes(app.owner.name, app.name, dateBefore(now, DayRange));
+    navigation.push("GridStats", {
+      title: "OS Versions",
+      data: { total: oses.total, values: oses.oses },
+      labelField: "os_name",
+    });
+  }, []);
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.pop()} />
         <Appbar.Content title={app.display_name} />
       </Appbar.Header>
-      <ScrollView>
-        <View style={{ marginHorizontal: 16, marginBottom: 16 }}>
-          <Card style={styles.card}>
-            <Card.Title title="Info" />
-            <Card.Content>
-              <Text>OS: {app.os}</Text>
-              <Text>Platform: {app.platform}</Text>
-              <Text>Release Type: {app.release_type}</Text>
-              <Text>Created At: {new Date(app.created_at).toDateString()}</Text>
-            </Card.Content>
-          </Card>
+      <ScrollView style={{ marginHorizontal: 16, marginBottom: 16, flex: 1 }}>
+        <Card style={styles.card}>
+          <Card.Title title="Info" />
+          <Card.Content>
+            <Text>OS: {app.os}</Text>
+            <Text>Platform: {app.platform}</Text>
+            <Text>Release Type: {app.release_type}</Text>
+            <Text>Created At: {new Date(app.created_at).toDateString()}</Text>
+          </Card.Content>
+        </Card>
 
-          <Card style={styles.card}>
-            <Card.Title title="Latest Version" />
-            <Card.Content>
-              <Text>Version: {latestVersion.value}</Text>
-              <Text>Percentage: {latestVersion.rate.toFixed(2)} %</Text>
-            </Card.Content>
-          </Card>
+        <Card style={styles.card}>
+          <Card.Title title="Latest Version" />
+          <Card.Content>
+            <Text>Version: {latestVersion.value}</Text>
+            <Text>Percentage: {latestVersion.rate.toFixed(2)} %</Text>
+          </Card.Content>
+        </Card>
 
-          <Card style={styles.card}>
-            <Card.Title title="Active Devices" />
-            <Card.Content>
-              <Text>Daily: {activeDevice.daily}</Text>
-              <Text>Weekly: {activeDevice.weekly}</Text>
-              <Text>Monthly: {activeDevice.monthly}</Text>
-            </Card.Content>
-          </Card>
+        {versions && <VersionPieChart versions={versions} />}
 
-          <Card style={styles.card} onPress={goModelStats}>
-            <Card.Title title="Models" />
-          </Card>
-        </View>
+        {activeDevices && <ActiveDeviceChart activeDeviceCounts={activeDevices} />}
+
+        <Card style={styles.card} onPress={goModelStats}>
+          <Card.Title title="Models" />
+        </Card>
+
+        <Card style={styles.card} onPress={goOsStats}>
+          <Card.Title title="OS Versions" />
+        </Card>
       </ScrollView>
     </View>
   );
