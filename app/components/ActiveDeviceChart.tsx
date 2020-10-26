@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { Card } from "react-native-paper";
 import { Grid, LineChart, XAxis, YAxis } from "react-native-svg-charts";
 import { ActiveDeviceCounts } from "../models/ApiModels";
@@ -9,8 +9,9 @@ import moment from "moment";
 
 type Props = {
   activeDeviceCounts: ActiveDeviceCounts;
+  style?: StyleProp<ViewStyle>;
 };
-const ActiveDeviceChart = ({ activeDeviceCounts: counts }: Props) => {
+const ActiveDeviceChart = ({ activeDeviceCounts: counts, style }: Props) => {
   const yMax = useMemo(
     () =>
       roundMaxValue(
@@ -33,7 +34,7 @@ const ActiveDeviceChart = ({ activeDeviceCounts: counts }: Props) => {
   const [yAxisWidth, setYAxisWidth] = useState(0);
   const contentInset = { left: 5, right: 5, top: 5, bottom: 20 };
   return (
-    <Card style={{ marginTop: 16 }}>
+    <Card style={[style]}>
       <Card.Title title="Active Devices" />
       <Card.Content>
         <View style={{ flexDirection: "row" }}>

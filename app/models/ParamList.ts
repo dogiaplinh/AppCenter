@@ -1,15 +1,12 @@
-import { AppItem } from "./ApiModels";
+import { AppItem, CountsResult, StatsType } from "./ApiModels";
 
 export type StackParamList = {
   Login: undefined;
   AppList: undefined;
   App: { app: AppItem };
   GridStats: {
+    app: AppItem;
     title: string;
-    data: {
-      total: number;
-      values: ({ count: number } & Record<string, string | number>)[];
-    };
-    labelField: string;
+    type: StatsType;
   };
 };

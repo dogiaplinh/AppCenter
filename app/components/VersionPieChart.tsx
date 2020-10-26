@@ -1,38 +1,37 @@
 import React, { useMemo } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, StyleProp, Text, View, ViewStyle } from "react-native";
 import { Card } from "react-native-paper";
 import { PieChart, PieChartData } from "react-native-svg-charts";
-import { VersionsResult } from "../models/ApiModels";
+import { CountsResult } from "../models/ApiModels";
 
 type Props = {
-  versions: VersionsResult;
+  versions: CountsResult;
+  style?: StyleProp<ViewStyle>;
 };
 type VersionPieData = PieChartData & { index: number };
 
-const VersionPieChart = ({ versions }: Props) => {
+const VersionPieChart = ({ versions, style }: Props) => {
   const randomColor = () =>
     ("#" + ((Math.random() * 0xffffff) << 0).toString(16) + "000000").slice(0, 7);
   const chartData: VersionPieData[] = useMemo(
     () =>
-      versions.versions
+      versions.values
         .map((x, index) => ({
           index,
           value: x.count,
-          key: x.version,
-          svg: {
-            fill: randomColor(),
-          },
+          key: x.key,
+          svg: { fill: randomColor() },
         }))
         .sort((a, b) => b.index - a.index),
     [versions],
   );
   const [latestVersion, percentage] = useMemo(() => {
-    const lastItem = versions.versions[versions.versions.length - 1];
-    return [lastItem.version, (lastItem.count / versions.total) * 100];
+    const lastItem = versions.values[versions.values.length - 1];
+    return [lastItem.key, (lastItem.count / versions.total) * 100];
   }, [versions]);
 
   return (
-    <Card style={{ marginTop: 16 }}>
+    <Card style={[style]}>
       <Card.Title
         title="App Versions"
         subtitle={`Latest version: ${latestVersion} (${percentage.toFixed(2)}%)`}
@@ -49,7 +48,7 @@ const VersionPieChart = ({ versions }: Props) => {
         <View style={{ marginTop: 20 }}>
           <FlatList
             data={chartData}
-            numColumns={5}
+            numColumns={4}
             renderItem={({ item, index }) => (
               <View style={{ flexDirection: "row", margin: 5 }}>
                 <View

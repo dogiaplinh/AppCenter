@@ -11,7 +11,7 @@ import { LogBox } from "react-native";
 import AppScreen from "./app/screens/AppScreen";
 import GridStatsScreen from "./app/screens/GridStatsScreen";
 
-LogBox.ignoreLogs(["Require cycle"]);
+LogBox.ignoreLogs(["Require cycle", "VirtualizedLists should never"]);
 enableScreens();
 const Stack = createNativeStackNavigator();
 

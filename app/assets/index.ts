@@ -1,3 +1,3 @@
 export const Constants = {
-  DEFAULT_MAX_RESULTS: 30,
+  DEFAULT_MAX_RESULTS: 15,
 };

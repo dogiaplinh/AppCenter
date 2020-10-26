@@ -1,15 +1,14 @@
-import {
-  ActiveDeviceCounts,
-  AppItem,
-  ModelsResult,
-  OsResult,
-  User,
-  VersionsResult,
-} from "../models/ApiModels";
+import { ActiveDeviceCounts, AppItem, CountsResult, User } from "../models/ApiModels";
 import qs from "qs";
 import moment from "moment";
 import { Constants } from "../assets";
 
+export type SearchCommonOptions = {
+  start: Date;
+  end?: Date;
+  limit?: number;
+  offset?: number;
+};
 class ApiClient {
   private apiToken: string;
 
@@ -21,7 +20,19 @@ class ApiClient {
     return this.apiToken;
   }
 
-  private async callApi<T>(url: string, queryString?: Record<string, string | number>): Promise<T> {
+  private getQueryParams(options: SearchCommonOptions) {
+    return {
+      start: moment(options.start).format(),
+      end: options.end && moment(options.end).format(),
+      $top: options.limit || Constants.DEFAULT_MAX_RESULTS,
+      $skip: options.offset || 0,
+    };
+  }
+
+  private async callApi<T = any>(
+    url: string,
+    queryString?: Record<string, string | number>,
+  ): Promise<T> {
     const q = queryString ? "?" + qs.stringify(queryString, { skipNulls: true }) : "";
     const response = await fetch(url + q, {
       headers: {
@@ -42,69 +53,108 @@ class ApiClient {
   async getVersions(
     username: string,
     appName: string,
-    startDate: Date,
-    endDate?: Date,
-    limit?: number,
-  ) {
-    return this.callApi<VersionsResult>(
+    options: SearchCommonOptions,
+  ): Promise<CountsResult> {
+    const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/versions`,
-      {
-        start: moment(startDate).format("YYYY-MM-DD"),
-        end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit || Constants.DEFAULT_MAX_RESULTS,
-      },
+      this.getQueryParams(options),
     );
+    return {
+      type: "version",
+      total: result.total,
+      values: result.versions.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.version,
+      })),
+    };
   }
 
-  async getActiveDeviceCounts(
-    username: string,
-    appName: string,
-    startDate: Date,
-    endDate?: Date,
-    limit?: number,
-  ) {
+  async getActiveDeviceCounts(username: string, appName: string, options: SearchCommonOptions) {
     return this.callApi<ActiveDeviceCounts>(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/active_device_counts`,
-      {
-        start: moment(startDate).format("YYYY-MM-DD"),
-        end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit || Constants.DEFAULT_MAX_RESULTS,
-      },
+      this.getQueryParams(options),
     );
   }
 
   async getModels(
     username: string,
     appName: string,
-    startDate: Date,
-    endDate?: Date,
-    limit?: number,
-  ) {
-    return this.callApi<ModelsResult>(
+    options: SearchCommonOptions,
+  ): Promise<CountsResult> {
+    const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/models`,
-      {
-        start: moment(startDate).format("YYYY-MM-DD"),
-        end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit || Constants.DEFAULT_MAX_RESULTS,
-      },
+      this.getQueryParams(options),
     );
+    return {
+      type: "model",
+      total: result.total,
+      values: result.models.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.model_name,
+      })),
+    };
   }
 
   async getOSes(
     username: string,
     appName: string,
-    startDate: Date,
-    endDate?: Date,
-    limit?: number,
-  ) {
-    return this.callApi<OsResult>(
+    options: SearchCommonOptions,
+  ): Promise<CountsResult> {
+    const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/oses`,
-      {
-        start: moment(startDate).format("YYYY-MM-DD"),
-        end: endDate && moment(endDate).format("YYYY-MM-DD"),
-        $top: limit || Constants.DEFAULT_MAX_RESULTS,
-      },
+      this.getQueryParams(options),
     );
+    return {
+      type: "os",
+      total: result.total,
+      values: result.oses.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.os_name,
+      })),
+    };
+  }
+
+  async getLanguages(
+    username: string,
+    appName: string,
+    options: SearchCommonOptions,
+  ): Promise<CountsResult> {
+    const result = await this.callApi(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/languages`,
+      this.getQueryParams(options),
+    );
+    return {
+      type: "language",
+      total: result.total,
+      values: result.languages.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.language_name,
+      })),
+    };
+  }
+
+  async getPlaces(
+    username: string,
+    appName: string,
+    options: SearchCommonOptions,
+  ): Promise<CountsResult> {
+    const result = await this.callApi(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/places`,
+      this.getQueryParams(options),
+    );
+    return {
+      type: "place",
+      total: result.total,
+      values: result.places.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.code,
+      })),
+    };
   }
 }
 

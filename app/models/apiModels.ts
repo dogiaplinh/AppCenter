@@ -42,14 +42,18 @@ export type AzureSubscription = {
   tenant_id: string;
 };
 
-export type VersionItem = {
-  version: string;
+export type StatsType = "model" | "os" | "version" | "language" | "place";
+
+export type CountItem = {
+  key: string;
   count: number;
+  previousCount?: number;
 };
 
-export type VersionsResult = {
-  versions: VersionItem[];
+export type CountsResult = {
+  type: StatsType;
   total: number;
+  values: CountItem[];
 };
 
 export type DateTimeItem = {
@@ -62,25 +66,4 @@ export type ActiveDeviceCounts = {
   daily?: DateTimeItem[];
   weekly?: DateTimeItem[];
   monthly?: DateTimeItem[];
-};
-
-export type ModelItem = {
-  model_name: string;
-  count: number;
-};
-
-export type ModelsResult = {
-  total: number;
-  models: ModelItem[];
-};
-
-export type OsItem = {
-  os_name?: string;
-  count: number;
-  previous_count?: number;
-};
-
-export type OsResult = {
-  total: number;
-  oses: OsItem[];
 };
