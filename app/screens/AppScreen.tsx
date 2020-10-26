@@ -2,11 +2,11 @@ import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { memo, useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { Appbar, Card } from "react-native-paper";
+import { Appbar, Card, DataTable } from "react-native-paper";
 import apiClient from "../utils/ApiClient";
 import { StackParamList } from "../models/ParamList";
 import { dateBefore } from "../utils/DateUtils";
-import { ActiveDeviceCounts, CountsResult } from "../models/ApiModels";
+import { ActiveDeviceCounts, CountsResult, EventsResult } from "../models/ApiModels";
 import ActiveDeviceChart from "../components/ActiveDeviceChart";
 import VersionPieChart from "../components/VersionPieChart";
 
@@ -20,6 +20,7 @@ const AppScreen = ({ navigation, route }: Props) => {
   const app = route.params.app;
   const [versions, setVersions] = useState<CountsResult>(undefined);
   const [activeDevices, setActiveDevices] = useState<ActiveDeviceCounts>(undefined);
+  const [eventsResult, setEventsResult] = useState<EventsResult>(undefined);
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     (async () => {
@@ -35,6 +36,14 @@ const AppScreen = ({ navigation, route }: Props) => {
         start: dateBefore(now, DayRange),
       });
       setActiveDevices(activeDeviceCounts);
+    })();
+  }, [now]);
+  useEffect(() => {
+    (async () => {
+      const eventsResult = await apiClient.getEventsSummary(app.owner.name, app.name, {
+        start: dateBefore(now, DayRange),
+      });
+      setEventsResult(eventsResult);
     })();
   }, [now]);
   const goModelStats = useCallback(() => {
@@ -79,6 +88,28 @@ const AppScreen = ({ navigation, route }: Props) => {
 
         <Card style={styles.card} onPress={goPlacesStats}>
           <Card.Title title="Places" />
+        </Card>
+
+        <Card style={styles.card}>
+          <Card.Title title="Events" />
+          <Card.Content>
+            <DataTable>
+              {eventsResult?.events.map((x) => (
+                <DataTable.Row
+                  key={x.name}
+                  onPress={() =>
+                    navigation.push("EventDetails", {
+                      app,
+                      name: x.name,
+                    })
+                  }
+                >
+                  <DataTable.Cell>{x.name}</DataTable.Cell>
+                  <DataTable.Cell numeric>{x.count}</DataTable.Cell>
+                </DataTable.Row>
+              ))}
+            </DataTable>
+          </Card.Content>
         </Card>
 
         <View style={{ height: 16 }} />

@@ -10,6 +10,7 @@ import AppListScreen from "./app/screens/AppListScreen";
 import { LogBox } from "react-native";
 import AppScreen from "./app/screens/AppScreen";
 import GridStatsScreen from "./app/screens/GridStatsScreen";
+import EventDetailsScreen from "./app/screens/EventDetailsScreen";
 
 LogBox.ignoreLogs(["Require cycle", "VirtualizedLists should never"]);
 enableScreens();
@@ -25,6 +26,7 @@ const App = () => {
             <Stack.Screen name="AppList" component={AppListScreen} />
             <Stack.Screen name="App" component={AppScreen} />
             <Stack.Screen name="GridStats" component={GridStatsScreen} />
+            <Stack.Screen name="EventDetails" component={EventDetailsScreen} />
           </>
         ) : (
           <>

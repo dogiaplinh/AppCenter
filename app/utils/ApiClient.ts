@@ -1,4 +1,4 @@
-import { ActiveDeviceCounts, AppItem, CountsResult, User } from "../models/ApiModels";
+import { ActiveDeviceCounts, AppItem, CountsResult, EventsResult, User } from "../models/ApiModels";
 import qs from "qs";
 import moment from "moment";
 import { Constants } from "../assets";
@@ -155,6 +155,25 @@ class ApiClient {
         key: x.code,
       })),
     };
+  }
+
+  async getEventsSummary(username: string, appName: string, options: SearchCommonOptions) {
+    return this.callApi<EventsResult>(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events`,
+      this.getQueryParams(options),
+    );
+  }
+
+  async getEventDeviceCount(
+    username: string,
+    appName: string,
+    eventName: string,
+    options: SearchCommonOptions,
+  ) {
+    return this.callApi(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/device_count`,
+      this.getQueryParams(options),
+    );
   }
 }
 

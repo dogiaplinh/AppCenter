@@ -9,4 +9,8 @@ export type StackParamList = {
     title: string;
     type: StatsType;
   };
+  EventDetails: {
+    app: AppItem;
+    name: string;
+  };
 };

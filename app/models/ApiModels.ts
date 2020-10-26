@@ -67,3 +67,19 @@ export type ActiveDeviceCounts = {
   weekly?: DateTimeItem[];
   monthly?: DateTimeItem[];
 };
+
+export type EventSummary = {
+  id: string;
+  name: string;
+  device_count: number;
+  previous_device_count: number;
+  count: number;
+  previous_count: number;
+  count_per_device: number;
+};
+
+export type EventsResult = {
+  events: EventSummary[];
+  total: number;
+  total_devices: number;
+};
