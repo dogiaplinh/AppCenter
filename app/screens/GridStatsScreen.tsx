@@ -3,12 +3,13 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import React, { memo, useCallback, useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { Appbar, Button, Card, Colors, ProgressBar } from "react-native-paper";
+import { Constants } from "../assets";
 import { AppItem, CountsResult, StatsType } from "../models/ApiModels";
 import { StackParamList } from "../models/ParamList";
-import apiClient, { SearchCommonOptions } from "../utils/ApiClient";
+import apiClient, { CommonFilterOptions } from "../utils/ApiClient";
 import { dateBefore } from "../utils/DateUtils";
 
-async function getData(app: AppItem, type: StatsType, options: SearchCommonOptions) {
+async function getData(app: AppItem, type: StatsType, options: CommonFilterOptions) {
   let result: CountsResult;
   switch (type) {
     case "model":
@@ -41,6 +42,7 @@ type Props = {
 const GridStatsScreen = ({ navigation, route }: Props) => {
   const { title, type, app } = route.params;
   const [data, setData] = useState<CountsResult>(undefined);
+  const [hasMore, setHasMore] = useState(true);
   const now = new Date();
   useEffect(() => {
     (async () => {
@@ -62,11 +64,13 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
           start: dateBefore(now, 7),
           offset,
         });
-        const data2: CountsResult = {
-          ...data,
-          values: [...data.values.slice(0, offset), ...newData.values],
-        };
-        setData(data2);
+        if (newData.values[0].count < data.values[0].count) {
+          const data2: CountsResult = {
+            ...data,
+            values: [...data.values.slice(0, offset), ...newData.values],
+          };
+          setData(data2);
+        } else setHasMore(false);
       })();
     }
   }, [data]);
@@ -74,9 +78,11 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
   if (data) {
     const maxValue = data.values[0].count;
     content = (
-      <View style={{ padding: 16, flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={data.values}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: 16 }}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={{ paddingVertical: 4 }}>
@@ -92,9 +98,11 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
             </View>
           )}
         />
-        <Button style={{ marginTop: 20 }} onPress={loadMoreCallback}>
-          <Text>Load more</Text>
-        </Button>
+        {hasMore && (
+          <Button style={{ margin: 16 }} onPress={loadMoreCallback}>
+            <Text>Load more</Text>
+          </Button>
+        )}
       </View>
     );
   }

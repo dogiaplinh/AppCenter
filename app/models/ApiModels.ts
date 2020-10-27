@@ -42,7 +42,7 @@ export type AzureSubscription = {
   tenant_id: string;
 };
 
-export type StatsType = "model" | "os" | "version" | "language" | "place";
+export type StatsType = "model" | "os" | "version" | "language" | "place" | "event_property";
 
 export type CountItem = {
   key: string;
@@ -82,4 +82,17 @@ export type EventsResult = {
   events: EventSummary[];
   total: number;
   total_devices: number;
+};
+
+export type EventCountResult = {
+  total_count: number;
+  previous_total_count: number;
+  count: DateTimeItem[];
+};
+
+export type EventDeviceCountResult = {
+  total_devices: number;
+  total_devices_with_event: number;
+  previous_total_devices_with_event: number;
+  devices_count: DateTimeItem[];
 };

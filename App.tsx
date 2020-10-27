@@ -7,7 +7,7 @@ import LoginScreen from "./app/screens/LoginScreen";
 import { AllState } from "./app/store";
 import { useSelector } from "react-redux";
 import AppListScreen from "./app/screens/AppListScreen";
-import { LogBox } from "react-native";
+import { LogBox, StatusBar } from "react-native";
 import AppScreen from "./app/screens/AppScreen";
 import GridStatsScreen from "./app/screens/GridStatsScreen";
 import EventDetailsScreen from "./app/screens/EventDetailsScreen";
@@ -20,6 +20,7 @@ const App = () => {
   const logged = useSelector((state: AllState) => state.user.logged);
   return (
     <NavigationContainer>
+      <StatusBar />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {logged ? (
           <>

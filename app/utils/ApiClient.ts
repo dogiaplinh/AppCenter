@@ -1,9 +1,17 @@
-import { ActiveDeviceCounts, AppItem, CountsResult, EventsResult, User } from "../models/ApiModels";
+import {
+  ActiveDeviceCounts,
+  AppItem,
+  CountsResult,
+  EventCountResult,
+  EventDeviceCountResult,
+  EventsResult,
+  User,
+} from "../models/ApiModels";
 import qs from "qs";
 import moment from "moment";
 import { Constants } from "../assets";
 
-export type SearchCommonOptions = {
+export type CommonFilterOptions = {
   start: Date;
   end?: Date;
   limit?: number;
@@ -20,7 +28,7 @@ class ApiClient {
     return this.apiToken;
   }
 
-  private getQueryParams(options: SearchCommonOptions) {
+  private getQueryParams(options: CommonFilterOptions) {
     return {
       start: moment(options.start).format(),
       end: options.end && moment(options.end).format(),
@@ -53,7 +61,7 @@ class ApiClient {
   async getVersions(
     username: string,
     appName: string,
-    options: SearchCommonOptions,
+    options: CommonFilterOptions,
   ): Promise<CountsResult> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/versions`,
@@ -70,7 +78,7 @@ class ApiClient {
     };
   }
 
-  async getActiveDeviceCounts(username: string, appName: string, options: SearchCommonOptions) {
+  async getActiveDeviceCounts(username: string, appName: string, options: CommonFilterOptions) {
     return this.callApi<ActiveDeviceCounts>(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/active_device_counts`,
       this.getQueryParams(options),
@@ -80,7 +88,7 @@ class ApiClient {
   async getModels(
     username: string,
     appName: string,
-    options: SearchCommonOptions,
+    options: CommonFilterOptions,
   ): Promise<CountsResult> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/models`,
@@ -100,7 +108,7 @@ class ApiClient {
   async getOSes(
     username: string,
     appName: string,
-    options: SearchCommonOptions,
+    options: CommonFilterOptions,
   ): Promise<CountsResult> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/oses`,
@@ -120,7 +128,7 @@ class ApiClient {
   async getLanguages(
     username: string,
     appName: string,
-    options: SearchCommonOptions,
+    options: CommonFilterOptions,
   ): Promise<CountsResult> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/languages`,
@@ -140,7 +148,7 @@ class ApiClient {
   async getPlaces(
     username: string,
     appName: string,
-    options: SearchCommonOptions,
+    options: CommonFilterOptions,
   ): Promise<CountsResult> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/places`,
@@ -157,7 +165,11 @@ class ApiClient {
     };
   }
 
-  async getEventsSummary(username: string, appName: string, options: SearchCommonOptions) {
+  async getEventsSummary(
+    username: string,
+    appName: string,
+    options: CommonFilterOptions,
+  ): Promise<EventsResult> {
     return this.callApi<EventsResult>(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events`,
       this.getQueryParams(options),
@@ -168,12 +180,57 @@ class ApiClient {
     username: string,
     appName: string,
     eventName: string,
-    options: SearchCommonOptions,
+    options: CommonFilterOptions,
   ) {
-    return this.callApi(
+    return this.callApi<EventDeviceCountResult>(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/device_count`,
       this.getQueryParams(options),
     );
+  }
+
+  async getEventCount(
+    username: string,
+    appName: string,
+    eventName: string,
+    options: CommonFilterOptions,
+  ) {
+    return this.callApi<EventCountResult>(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/event_count`,
+      this.getQueryParams(options),
+    );
+  }
+
+  async getEventProperties(
+    username: string,
+    appName: string,
+    eventName: string,
+  ): Promise<string[]> {
+    const result = await this.callApi(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/properties`,
+    );
+    return result.event_properties;
+  }
+
+  async getEventPropertyCount(
+    username: string,
+    appName: string,
+    eventName: string,
+    propertyName: string,
+    options: CommonFilterOptions,
+  ): Promise<CountsResult> {
+    const result = await this.callApi(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/properties/${propertyName}/counts`,
+      this.getQueryParams(options),
+    );
+    return {
+      type: "event_property",
+      total: result.total,
+      values: result.values.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.name,
+      })),
+    };
   }
 }
 
