@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { FlatList, StyleProp, Text, View, ViewStyle } from "react-native";
 import { Card } from "react-native-paper";
 import { PieChart, PieChartData } from "react-native-svg-charts";
@@ -69,4 +69,4 @@ const VersionPieChart = ({ versions, style }: Props) => {
   );
 };
 
-export default VersionPieChart;
+export default memo(VersionPieChart);

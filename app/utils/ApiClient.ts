@@ -5,6 +5,7 @@ import {
   EventCountResult,
   EventDeviceCountResult,
   EventsResult,
+  SessionDurationsDistribution,
   User,
 } from "../models/ApiModels";
 import qs from "qs";
@@ -229,6 +230,25 @@ class ApiClient {
         count: x.count,
         previousCount: x.previous_count,
         key: x.name,
+      })),
+    };
+  }
+
+  async getSessionDurationsDistribution(
+    username: string,
+    appName: string,
+    options: CommonFilterOptions,
+  ): Promise<SessionDurationsDistribution> {
+    const result = await this.callApi(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/session_durations_distribution`,
+      this.getQueryParams(options),
+    );
+    return {
+      ...result,
+      distribution: result.distribution.map((x) => ({
+        count: x.count,
+        previousCount: x.previous_count,
+        key: x.bucket,
       })),
     };
   }

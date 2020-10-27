@@ -64,7 +64,12 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
       </Appbar.Header>
       <ScrollView style={{ flex: 1 }}>
         {eventCounts && (
-          <CountOverTimeChart style={styles.card} counts={eventCounts.count} title="Count" />
+          <CountOverTimeChart
+            style={styles.card}
+            counts={eventCounts.count}
+            title="Count"
+            subtitle={`Total: ${eventCounts.total_count}`}
+          />
         )}
 
         {deviceCounts && (
@@ -72,6 +77,7 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
             style={styles.card}
             counts={deviceCounts.devices_count}
             title="Users"
+            subtitle={`Total: ${deviceCounts.total_devices_with_event}`}
           />
         )}
 

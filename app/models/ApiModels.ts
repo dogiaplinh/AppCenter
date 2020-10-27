@@ -96,3 +96,9 @@ export type EventDeviceCountResult = {
   previous_total_devices_with_event: number;
   devices_count: DateTimeItem[];
 };
+
+export type SessionDurationsDistribution = {
+  distribution: CountItem[];
+  previous_average_duration: string;
+  average_duration: string;
+};

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { Card } from "react-native-paper";
 import { Grid, LineChart, XAxis, YAxis } from "react-native-svg-charts";
@@ -114,7 +114,7 @@ const ActiveDeviceChart = ({ activeDeviceCounts: counts, style }: Props) => {
   );
 };
 
-export default ActiveDeviceChart;
+export default memo(ActiveDeviceChart);
 
 const styles = StyleSheet.create({
   lineChartOverlay: {

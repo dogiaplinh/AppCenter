@@ -6,9 +6,15 @@ import { Appbar, Card, DataTable } from "react-native-paper";
 import apiClient from "../utils/ApiClient";
 import { StackParamList } from "../models/ParamList";
 import { dateBefore } from "../utils/DateUtils";
-import { ActiveDeviceCounts, CountsResult, EventsResult } from "../models/ApiModels";
+import {
+  ActiveDeviceCounts,
+  CountsResult,
+  EventsResult,
+  SessionDurationsDistribution,
+} from "../models/ApiModels";
 import ActiveDeviceChart from "../components/ActiveDeviceChart";
 import VersionPieChart from "../components/VersionPieChart";
+import SessionDurationsDistributionChart from "../components/SessionDurationsDistributionChart";
 
 const DayRange = 14;
 
@@ -21,6 +27,9 @@ const AppScreen = ({ navigation, route }: Props) => {
   const [versions, setVersions] = useState<CountsResult>(undefined);
   const [activeDevices, setActiveDevices] = useState<ActiveDeviceCounts>(undefined);
   const [eventsResult, setEventsResult] = useState<EventsResult>(undefined);
+  const [durationsDistribution, setDurationsDistribution] = useState<SessionDurationsDistribution>(
+    undefined,
+  );
   const [now, setNow] = useState(new Date());
   useEffect(() => {
     (async () => {
@@ -44,6 +53,16 @@ const AppScreen = ({ navigation, route }: Props) => {
         start: dateBefore(now, DayRange),
       });
       setEventsResult(eventsResult);
+    })();
+  }, [now]);
+  useEffect(() => {
+    (async () => {
+      const eventsResult = await apiClient.getSessionDurationsDistribution(
+        app.owner.name,
+        app.name,
+        { start: dateBefore(now, DayRange) },
+      );
+      setDurationsDistribution(eventsResult);
     })();
   }, [now]);
   const goModelStats = useCallback(() => {
@@ -72,6 +91,13 @@ const AppScreen = ({ navigation, route }: Props) => {
 
         {versions?.values?.length > 0 && (
           <VersionPieChart style={styles.card} versions={versions} />
+        )}
+
+        {durationsDistribution?.distribution?.length > 0 && (
+          <SessionDurationsDistributionChart
+            style={styles.card}
+            distribution={durationsDistribution}
+          />
         )}
 
         <Card style={styles.card} onPress={goModelStats}>
