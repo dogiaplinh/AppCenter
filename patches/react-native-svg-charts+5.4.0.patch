@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-svg-charts/src/x-axis.js b/node_modules/react-native-svg-charts/src/x-axis.js
+index e28943e..87cab49 100644
+--- a/node_modules/react-native-svg-charts/src/x-axis.js
++++ b/node_modules/react-native-svg-charts/src/x-axis.js
+@@ -73,7 +73,7 @@ class XAxis extends PureComponent {
+ 
+         return (
+             <View style={style}>
+-                <View style={{ flexGrow: 1 }} onLayout={(event) => this._onLayout(event)}>
++                <View style={{ flex: 1 }} onLayout={(event) => this._onLayout(event)}>
+                     {/*invisible text to allow for parent resizing*/}
+                     <Text
+                         style={{

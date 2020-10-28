@@ -1,4 +1,5 @@
 import { AppItem, CountsResult, StatsType } from "./ApiModels";
+import { DateRange } from "./Models";
 
 export type StackParamList = {
   Login: undefined;
@@ -8,9 +9,11 @@ export type StackParamList = {
     app: AppItem;
     title: string;
     type: StatsType;
+    dateRange: DateRange;
   };
   EventDetails: {
     app: AppItem;
     name: string;
+    dateRange: DateRange;
   };
 };

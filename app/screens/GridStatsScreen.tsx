@@ -1,6 +1,6 @@
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { Appbar, Button, Card, Colors, ProgressBar } from "react-native-paper";
 import { Constants } from "../assets";
@@ -8,6 +8,7 @@ import { AppItem, CountsResult, StatsType } from "../models/ApiModels";
 import { StackParamList } from "../models/ParamList";
 import apiClient, { CommonFilterOptions } from "../utils/ApiClient";
 import { dateBefore } from "../utils/DateUtils";
+import { parseAndroidVersion } from "../utils/StringUtils";
 
 async function getData(app: AppItem, type: StatsType, options: CommonFilterOptions) {
   let result: CountsResult;
@@ -40,14 +41,13 @@ type Props = {
   route: RouteProp<StackParamList, "GridStats">;
 };
 const GridStatsScreen = ({ navigation, route }: Props) => {
-  const { title, type, app } = route.params;
+  const { title, type, app, dateRange } = route.params;
   const [data, setData] = useState<CountsResult>(undefined);
   const [hasMore, setHasMore] = useState(true);
-  const now = new Date();
   useEffect(() => {
     (async () => {
       const data = await getData(app, type, {
-        start: dateBefore(now, 7),
+        ...dateRange,
       });
       setData(data);
     })();
@@ -61,7 +61,7 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
       }
       (async () => {
         const newData = await getData(app, type, {
-          start: dateBefore(now, 7),
+          ...dateRange,
           offset,
         });
         if (newData.values[0].count < data.values[0].count) {
@@ -74,6 +74,12 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
       })();
     }
   }, [data]);
+  const labelFormatter = useMemo(() => {
+    if (type === "os" && app.os === "Android") {
+      return (x: string) => parseAndroidVersion(x);
+    }
+    return undefined;
+  }, []);
   let content = undefined;
   if (data) {
     const maxValue = data.values[0].count;
@@ -87,7 +93,7 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
           renderItem={({ item }) => (
             <View style={{ paddingVertical: 4 }}>
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text>{item.key}</Text>
+                <Text>{labelFormatter?.(item.key) || item.key}</Text>
                 <Text>{item.count}</Text>
               </View>
               <ProgressBar

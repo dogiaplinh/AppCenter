@@ -15,8 +15,8 @@ import {
 import ActiveDeviceChart from "../components/ActiveDeviceChart";
 import VersionPieChart from "../components/VersionPieChart";
 import SessionDurationsDistributionChart from "../components/SessionDurationsDistributionChart";
-
-const DayRange = 14;
+import FilterBar from "../components/FilterBar";
+import { DateRange } from "../models/Models";
 
 type Props = {
   navigation: StackNavigationProp<StackParamList, "App">;
@@ -30,53 +30,60 @@ const AppScreen = ({ navigation, route }: Props) => {
   const [durationsDistribution, setDurationsDistribution] = useState<SessionDurationsDistribution>(
     undefined,
   );
+  const [filteredVersion, setFilteredVersion] = useState<string>(undefined);
   const [now, setNow] = useState(new Date());
+  const [dateRange, setDateRange] = useState<DateRange>({
+    start: dateBefore(now, 7),
+    end: now,
+  });
   useEffect(() => {
     (async () => {
       const versionList = await apiClient.getVersions(app.owner.name, app.name, {
-        start: dateBefore(now, DayRange),
+        ...dateRange,
       });
       setVersions(versionList);
     })();
-  }, [now]);
+  }, [now, dateRange]);
   useEffect(() => {
     (async () => {
       const activeDeviceCounts = await apiClient.getActiveDeviceCounts(app.owner.name, app.name, {
-        start: dateBefore(now, DayRange),
+        ...dateRange,
+        version: filteredVersion,
       });
       setActiveDevices(activeDeviceCounts);
     })();
-  }, [now]);
+  }, [now, filteredVersion, dateRange]);
   useEffect(() => {
     (async () => {
       const eventsResult = await apiClient.getEventsSummary(app.owner.name, app.name, {
-        start: dateBefore(now, DayRange),
+        ...dateRange,
+        version: filteredVersion,
       });
       setEventsResult(eventsResult);
     })();
-  }, [now]);
+  }, [now, filteredVersion, dateRange]);
   useEffect(() => {
     (async () => {
       const eventsResult = await apiClient.getSessionDurationsDistribution(
         app.owner.name,
         app.name,
-        { start: dateBefore(now, DayRange) },
+        { ...dateRange, version: filteredVersion },
       );
       setDurationsDistribution(eventsResult);
     })();
-  }, [now]);
+  }, [now, filteredVersion, dateRange]);
   const goModelStats = useCallback(() => {
-    navigation.push("GridStats", { title: "Models", type: "model", app });
-  }, []);
+    navigation.push("GridStats", { title: "Models", type: "model", app, dateRange });
+  }, [dateRange]);
   const goOsStats = useCallback(() => {
-    navigation.push("GridStats", { title: "OS Versions", type: "os", app });
-  }, []);
+    navigation.push("GridStats", { title: "OS Versions", type: "os", app, dateRange });
+  }, [dateRange]);
   const goLanguageStats = useCallback(() => {
-    navigation.push("GridStats", { title: "Languages", type: "language", app });
-  }, []);
+    navigation.push("GridStats", { title: "Languages", type: "language", app, dateRange });
+  }, [dateRange]);
   const goPlacesStats = useCallback(() => {
-    navigation.push("GridStats", { title: "Places", type: "place", app });
-  }, []);
+    navigation.push("GridStats", { title: "Places", type: "place", app, dateRange });
+  }, [dateRange]);
   return (
     <View style={{ flex: 1 }}>
       <Appbar.Header>
@@ -84,12 +91,19 @@ const AppScreen = ({ navigation, route }: Props) => {
         <Appbar.Content title={app.display_name} />
         <Appbar.Action icon="refresh" onPress={() => setNow(new Date())} />
       </Appbar.Header>
+      <View>
+        <FilterBar
+          versions={versions?.values?.map((x) => x.key)}
+          onChangeVersion={(ver) => setFilteredVersion(ver)}
+          onChangeTime={(dateRange) => setDateRange(dateRange)}
+        />
+      </View>
       <ScrollView style={{ paddingBottom: 16, flex: 1 }}>
         {activeDevices && (
           <ActiveDeviceChart style={styles.card} activeDeviceCounts={activeDevices} />
         )}
 
-        {versions?.values?.length > 0 && (
+        {versions?.values?.length > 0 && !filteredVersion && (
           <VersionPieChart style={styles.card} versions={versions} />
         )}
 
@@ -127,6 +141,7 @@ const AppScreen = ({ navigation, route }: Props) => {
                     navigation.push("EventDetails", {
                       app,
                       name: x.name,
+                      dateRange,
                     })
                   }
                 >

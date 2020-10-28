@@ -17,6 +17,7 @@ export type CommonFilterOptions = {
   end?: Date;
   limit?: number;
   offset?: number;
+  version?: string;
 };
 class ApiClient {
   private apiToken: string;
@@ -35,6 +36,7 @@ class ApiClient {
       end: options.end && moment(options.end).format(),
       $top: options.limit || Constants.DEFAULT_MAX_RESULTS,
       $skip: options.offset || 0,
+      versions: options.version,
     };
   }
 

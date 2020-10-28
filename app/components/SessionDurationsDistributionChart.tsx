@@ -1,9 +1,8 @@
-import React from "react";
+import React, { memo } from "react";
 import { View, Text, StyleProp, ViewStyle } from "react-native";
 import { Card } from "react-native-paper";
 import { BarChart, XAxis } from "react-native-svg-charts";
 import { CountItem, SessionDurationsDistribution } from "../models/ApiModels";
-import * as d3 from "d3-scale";
 
 type Props = {
   distribution: SessionDurationsDistribution;
@@ -28,11 +27,11 @@ const SessionDurationsDistributionChart = ({ distribution, style }: Props) => {
           contentInset={contentInset2}
           xAccessor={({ item, index }) => index}
           formatLabel={(value, index) => distribution.distribution[index].key}
+          style={{ minHeight: 50 }}
           svg={{
             fill: "black",
-            rotation: 0,
-            translateX: 0,
-            textAnchor: "middle",
+            rotation: 55,
+            textAnchor: "start",
           }}
         />
       </Card.Content>
@@ -40,4 +39,4 @@ const SessionDurationsDistributionChart = ({ distribution, style }: Props) => {
   );
 };
 
-export default SessionDurationsDistributionChart;
+export default memo(SessionDurationsDistributionChart);

@@ -7,35 +7,32 @@ import CountOverTimeChart from "../components/CountOverTimeChart";
 import { CountsResult, EventCountResult, EventDeviceCountResult } from "../models/ApiModels";
 import { StackParamList } from "../models/ParamList";
 import apiClient from "../utils/ApiClient";
-import { dateBefore } from "../utils/DateUtils";
 
-const DayRange = 14;
 type Props = {
   navigation: StackNavigationProp<StackParamList, "EventDetails">;
   route: RouteProp<StackParamList, "EventDetails">;
 };
 const EventDetailsScreen = ({ navigation, route }: Props) => {
-  const { name: eventName, app } = route.params;
+  const { name: eventName, app, dateRange } = route.params;
   const [eventCounts, setEventCounts] = useState<EventCountResult>(undefined);
   const [deviceCounts, setDeviceCounts] = useState<EventDeviceCountResult>(undefined);
   const [properties, setProperties] = useState<Record<string, CountsResult>>({});
-  const [now, setNow] = useState(new Date());
   useEffect(() => {
     (async () => {
       const result = await apiClient.getEventCount(app.owner.name, app.name, eventName, {
-        start: dateBefore(now, DayRange),
+        ...dateRange,
       });
       setEventCounts(result);
     })();
-  }, [now]);
+  }, []);
   useEffect(() => {
     (async () => {
       const result = await apiClient.getEventDeviceCount(app.owner.name, app.name, eventName, {
-        start: dateBefore(now, DayRange),
+        ...dateRange,
       });
       setDeviceCounts(result);
     })();
-  }, [now]);
+  }, []);
   useEffect(() => {
     (async () => {
       const properties = await apiClient.getEventProperties(app.owner.name, app.name, eventName);
@@ -46,21 +43,19 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
           app.name,
           eventName,
           prop,
-          {
-            start: dateBefore(now, DayRange),
-          },
+          { ...dateRange },
         );
         output[prop] = result;
       }
       setProperties(output);
     })();
-  }, [now]);
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.pop()} />
         <Appbar.Content title={eventName} />
-        <Appbar.Action icon="refresh" onPress={() => setNow(new Date())} />
+        <Appbar.Action icon="refresh" />
       </Appbar.Header>
       <ScrollView style={{ flex: 1 }}>
         {eventCounts && (
