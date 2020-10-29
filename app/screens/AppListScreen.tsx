@@ -13,7 +13,7 @@ type Props = {
   navigation: StackNavigationProp<StackParamList, "AppList">;
 };
 const AppListScreen = ({ navigation }: Props) => {
-  const [apps, setApps] = useState<AppItem[]>([]);
+  const [apps, setApps] = useState<AppItem[] | undefined>([]);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!apiClient.token) {

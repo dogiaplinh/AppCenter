@@ -63,9 +63,9 @@ export type DateTimeItem = {
 };
 
 export type ActiveDeviceCounts = {
-  daily?: DateTimeItem[];
-  weekly?: DateTimeItem[];
-  monthly?: DateTimeItem[];
+  daily: DateTimeItem[];
+  weekly: DateTimeItem[];
+  monthly: DateTimeItem[];
 };
 
 export type EventSummary = {

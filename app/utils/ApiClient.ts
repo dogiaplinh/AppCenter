@@ -20,9 +20,9 @@ export type CommonFilterOptions = {
   version?: string;
 };
 class ApiClient {
-  private apiToken: string;
+  private apiToken?: string;
 
-  setToken(token: string) {
+  setToken(token: string | undefined) {
     this.apiToken = token;
   }
 
@@ -30,7 +30,9 @@ class ApiClient {
     return this.apiToken;
   }
 
-  private getQueryParams(options: CommonFilterOptions) {
+  private getQueryParams(
+    options: CommonFilterOptions,
+  ): Record<string, string | number | undefined> {
     return {
       start: moment(options.start).format(),
       end: options.end && moment(options.end).format(),
@@ -42,22 +44,24 @@ class ApiClient {
 
   private async callApi<T = any>(
     url: string,
-    queryString?: Record<string, string | number>,
-  ): Promise<T> {
+    queryString?: Record<string, string | number | undefined>,
+  ): Promise<T | undefined> {
     const q = queryString ? "?" + qs.stringify(queryString, { skipNulls: true }) : "";
     const response = await fetch(url + q, {
       headers: {
-        ["X-API-Token"]: this.apiToken,
+        ["X-API-Token"]: this.apiToken || "",
       },
     });
-    if (response.status === 200) return await response.json();
+    if (response.status === 200) {
+      return await response.json();
+    }
   }
 
-  async getCurrentUser(): Promise<User> {
+  async getCurrentUser(): Promise<User | undefined> {
     return this.callApi<User>("https://api.appcenter.ms/v0.1/user");
   }
 
-  async getApps(): Promise<AppItem[]> {
+  async getApps(): Promise<AppItem[] | undefined> {
     return this.callApi<AppItem[]>("https://api.appcenter.ms/v0.1/apps");
   }
 
@@ -172,7 +176,7 @@ class ApiClient {
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<EventsResult> {
+  ): Promise<EventsResult | undefined> {
     return this.callApi<EventsResult>(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events`,
       this.getQueryParams(options),

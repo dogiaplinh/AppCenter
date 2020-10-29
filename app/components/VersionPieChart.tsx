@@ -55,7 +55,7 @@ const VersionPieChart = ({ versions, style }: Props) => {
                   style={{
                     height: 20,
                     width: 20,
-                    backgroundColor: item.svg.fill,
+                    backgroundColor: item.svg?.fill,
                     marginRight: 10,
                   }}
                 />

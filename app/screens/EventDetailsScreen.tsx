@@ -14,8 +14,8 @@ type Props = {
 };
 const EventDetailsScreen = ({ navigation, route }: Props) => {
   const { name: eventName, app, dateRange } = route.params;
-  const [eventCounts, setEventCounts] = useState<EventCountResult>(undefined);
-  const [deviceCounts, setDeviceCounts] = useState<EventDeviceCountResult>(undefined);
+  const [eventCounts, setEventCounts] = useState<EventCountResult | undefined>(undefined);
+  const [deviceCounts, setDeviceCounts] = useState<EventDeviceCountResult | undefined>(undefined);
   const [properties, setProperties] = useState<Record<string, CountsResult>>({});
   useEffect(() => {
     (async () => {

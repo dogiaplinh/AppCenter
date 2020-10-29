@@ -13,7 +13,7 @@ type Props = {
 };
 const LoginScreen = ({ navigation }: Props) => {
   const user = useSelector((state: AllState) => state.user);
-  const [key, setKey] = useState<string>(user.apiToken);
+  const [key, setKey] = useState<string | undefined>(user.apiToken);
   const dispatch = useDispatch();
   const loginCallback = useCallback(async () => {
     if (key) {

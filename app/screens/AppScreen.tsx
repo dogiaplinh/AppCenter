@@ -24,13 +24,13 @@ type Props = {
 };
 const AppScreen = ({ navigation, route }: Props) => {
   const app = route.params.app;
-  const [versions, setVersions] = useState<CountsResult>(undefined);
-  const [activeDevices, setActiveDevices] = useState<ActiveDeviceCounts>(undefined);
-  const [eventsResult, setEventsResult] = useState<EventsResult>(undefined);
-  const [durationsDistribution, setDurationsDistribution] = useState<SessionDurationsDistribution>(
-    undefined,
-  );
-  const [filteredVersion, setFilteredVersion] = useState<string>(undefined);
+  const [versions, setVersions] = useState<CountsResult | undefined>(undefined);
+  const [activeDevices, setActiveDevices] = useState<ActiveDeviceCounts | undefined>(undefined);
+  const [eventsResult, setEventsResult] = useState<EventsResult | undefined>(undefined);
+  const [durationsDistribution, setDurationsDistribution] = useState<
+    SessionDurationsDistribution | undefined
+  >(undefined);
+  const [filteredVersion, setFilteredVersion] = useState<string | undefined>(undefined);
   const [now, setNow] = useState(new Date());
   const [dateRange, setDateRange] = useState<DateRange>({
     start: dateBefore(now, 7),
@@ -103,11 +103,11 @@ const AppScreen = ({ navigation, route }: Props) => {
           <ActiveDeviceChart style={styles.card} activeDeviceCounts={activeDevices} />
         )}
 
-        {versions?.values?.length > 0 && !filteredVersion && (
+        {versions && versions.values?.length > 0 && !filteredVersion && (
           <VersionPieChart style={styles.card} versions={versions} />
         )}
 
-        {durationsDistribution?.distribution?.length > 0 && (
+        {durationsDistribution && durationsDistribution.distribution?.length > 0 && (
           <SessionDurationsDistributionChart
             style={styles.card}
             distribution={durationsDistribution}

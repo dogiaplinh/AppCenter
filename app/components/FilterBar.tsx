@@ -5,7 +5,7 @@ import { DateRange } from "../models/Models";
 import { currentDay, dateBefore } from "../utils/DateUtils";
 
 type Props = {
-  versions: string[];
+  versions?: string[];
   onChangeVersion?: (versions: string) => any;
   onChangeTime?: (dateRange: DateRange) => any;
 };

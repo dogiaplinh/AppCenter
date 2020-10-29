@@ -10,8 +10,12 @@ import apiClient, { CommonFilterOptions } from "../utils/ApiClient";
 import { dateBefore } from "../utils/DateUtils";
 import { parseAndroidVersion } from "../utils/StringUtils";
 
-async function getData(app: AppItem, type: StatsType, options: CommonFilterOptions) {
-  let result: CountsResult;
+async function getData(
+  app: AppItem,
+  type: StatsType,
+  options: CommonFilterOptions,
+): Promise<CountsResult | undefined> {
+  let result: CountsResult | undefined;
   switch (type) {
     case "model":
       result = await apiClient.getModels(app.owner.name, app.name, options);
@@ -32,6 +36,10 @@ async function getData(app: AppItem, type: StatsType, options: CommonFilterOptio
     case "place":
       result = await apiClient.getPlaces(app.owner.name, app.name, options);
       break;
+
+    default:
+      result = undefined;
+      break;
   }
   return result;
 }
@@ -42,7 +50,7 @@ type Props = {
 };
 const GridStatsScreen = ({ navigation, route }: Props) => {
   const { title, type, app, dateRange } = route.params;
-  const [data, setData] = useState<CountsResult>(undefined);
+  const [data, setData] = useState<CountsResult | undefined>(undefined);
   const [hasMore, setHasMore] = useState(true);
   useEffect(() => {
     (async () => {
@@ -53,6 +61,7 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
     })();
   }, []);
   const loadMoreCallback = useCallback(() => {
+    if (!data) return;
     let offset = data?.values?.length;
     if (offset) {
       const lastItem = data.values[data.values.length - 1];
@@ -64,7 +73,7 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
           ...dateRange,
           offset,
         });
-        if (newData.values[0].count < data.values[0].count) {
+        if (newData && newData.values[0].count < data.values[0].count) {
           const data2: CountsResult = {
             ...data,
             values: [...data.values.slice(0, offset), ...newData.values],
@@ -80,7 +89,7 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
     }
     return undefined;
   }, []);
-  let content = undefined;
+  let content: JSX.Element | undefined = undefined;
   if (data) {
     const maxValue = data.values[0].count;
     content = (
