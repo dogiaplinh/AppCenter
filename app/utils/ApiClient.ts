@@ -2,6 +2,7 @@ import {
   ActiveDeviceCounts,
   AppItem,
   CountsResult,
+  ErrorGroupsResult,
   EventCountResult,
   EventDeviceCountResult,
   EventsResult,
@@ -69,20 +70,22 @@ class ApiClient {
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<CountsResult> {
+  ): Promise<CountsResult | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/versions`,
       this.getQueryParams(options),
     );
-    return {
-      type: "version",
-      total: result.total,
-      values: result.versions.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.version,
-      })),
-    };
+    return (
+      result && {
+        type: "version",
+        total: result.total,
+        values: result.versions.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.version,
+        })),
+      }
+    );
   }
 
   async getActiveDeviceCounts(username: string, appName: string, options: CommonFilterOptions) {
@@ -96,80 +99,88 @@ class ApiClient {
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<CountsResult> {
+  ): Promise<CountsResult | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/models`,
       this.getQueryParams(options),
     );
-    return {
-      type: "model",
-      total: result.total,
-      values: result.models.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.model_name,
-      })),
-    };
+    return (
+      result && {
+        type: "model",
+        total: result.total,
+        values: result.models.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.model_name,
+        })),
+      }
+    );
   }
 
   async getOSes(
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<CountsResult> {
+  ): Promise<CountsResult | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/oses`,
       this.getQueryParams(options),
     );
-    return {
-      type: "os",
-      total: result.total,
-      values: result.oses.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.os_name,
-      })),
-    };
+    return (
+      result && {
+        type: "os",
+        total: result.total,
+        values: result.oses.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.os_name,
+        })),
+      }
+    );
   }
 
   async getLanguages(
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<CountsResult> {
+  ): Promise<CountsResult | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/languages`,
       this.getQueryParams(options),
     );
-    return {
-      type: "language",
-      total: result.total,
-      values: result.languages.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.language_name,
-      })),
-    };
+    return (
+      result && {
+        type: "language",
+        total: result.total,
+        values: result.languages.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.language_name,
+        })),
+      }
+    );
   }
 
   async getPlaces(
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<CountsResult> {
+  ): Promise<CountsResult | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/places`,
       this.getQueryParams(options),
     );
-    return {
-      type: "place",
-      total: result.total,
-      values: result.places.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.code,
-      })),
-    };
+    return (
+      result && {
+        type: "place",
+        total: result.total,
+        values: result.places.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.code,
+        })),
+      }
+    );
   }
 
   async getEventsSummary(
@@ -211,11 +222,11 @@ class ApiClient {
     username: string,
     appName: string,
     eventName: string,
-  ): Promise<string[]> {
+  ): Promise<string[] | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/properties`,
     );
-    return result.event_properties;
+    return result?.event_properties;
   }
 
   async getEventPropertyCount(
@@ -224,39 +235,54 @@ class ApiClient {
     eventName: string,
     propertyName: string,
     options: CommonFilterOptions,
-  ): Promise<CountsResult> {
+  ): Promise<CountsResult | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/events/${eventName}/properties/${propertyName}/counts`,
       this.getQueryParams(options),
     );
-    return {
-      type: "event_property",
-      total: result.total,
-      values: result.values.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.name,
-      })),
-    };
+    return (
+      result && {
+        type: "event_property",
+        total: result.total,
+        values: result.values.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.name,
+        })),
+      }
+    );
   }
 
   async getSessionDurationsDistribution(
     username: string,
     appName: string,
     options: CommonFilterOptions,
-  ): Promise<SessionDurationsDistribution> {
+  ): Promise<SessionDurationsDistribution | undefined> {
     const result = await this.callApi(
       `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/analytics/session_durations_distribution`,
       this.getQueryParams(options),
     );
-    return {
-      ...result,
-      distribution: result.distribution.map((x) => ({
-        count: x.count,
-        previousCount: x.previous_count,
-        key: x.bucket,
-      })),
-    };
+    return (
+      result && {
+        ...result,
+        distribution: result.distribution.map((x) => ({
+          count: x.count,
+          previousCount: x.previous_count,
+          key: x.bucket,
+        })),
+      }
+    );
+  }
+
+  async getErrorGroups(
+    username: string,
+    appName: string,
+    options: CommonFilterOptions,
+  ): Promise<ErrorGroupsResult | undefined> {
+    return this.callApi<ErrorGroupsResult>(
+      `https://api.appcenter.ms/v0.1/apps/${username}/${appName}/errors/errorGroups`,
+      this.getQueryParams(options),
+    );
   }
 }
 

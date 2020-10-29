@@ -15,7 +15,7 @@ async function getData(
   type: StatsType,
   options: CommonFilterOptions,
 ): Promise<CountsResult | undefined> {
-  let result: CountsResult | undefined;
+  let result: CountsResult | undefined = undefined;
   switch (type) {
     case "model":
       result = await apiClient.getModels(app.owner.name, app.name, options);
@@ -35,10 +35,6 @@ async function getData(
 
     case "place":
       result = await apiClient.getPlaces(app.owner.name, app.name, options);
-      break;
-
-    default:
-      result = undefined;
       break;
   }
   return result;

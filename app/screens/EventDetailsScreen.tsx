@@ -36,18 +36,20 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
   useEffect(() => {
     (async () => {
       const properties = await apiClient.getEventProperties(app.owner.name, app.name, eventName);
-      const output: Record<string, CountsResult> = {};
-      for (const prop of properties) {
-        const result = await apiClient.getEventPropertyCount(
-          app.owner.name,
-          app.name,
-          eventName,
-          prop,
-          { ...dateRange },
-        );
-        output[prop] = result;
+      if (properties) {
+        const output: Record<string, CountsResult> = {};
+        for (const prop of properties) {
+          const result = await apiClient.getEventPropertyCount(
+            app.owner.name,
+            app.name,
+            eventName,
+            prop,
+            { ...dateRange },
+          );
+          if (result) output[prop] = result;
+        }
+        setProperties(output);
       }
-      setProperties(output);
     })();
   }, []);
   return (
