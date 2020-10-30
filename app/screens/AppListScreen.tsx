@@ -32,7 +32,7 @@ const AppListScreen = ({ navigation }: Props) => {
     <View>
       <Appbar.Header>
         <Appbar.Content title="Apps" />
-        <Appbar.Action icon="logout" onPress={logoutCallback} />
+        <Appbar.Action icon="logout" onPress={logoutCallback} testID="logoutButton" />
       </Appbar.Header>
       <FlatList
         data={apps}
@@ -40,6 +40,7 @@ const AppListScreen = ({ navigation }: Props) => {
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
           <Card
+            testID="appCard"
             style={{ marginHorizontal: 16, marginVertical: 8 }}
             onPress={() => navigation.push("App", { app: item })}
           >

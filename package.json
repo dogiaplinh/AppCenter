@@ -40,6 +40,8 @@
     "@babel/core": "^7.8.4",
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",
+    "@testing-library/jest-native": "^3.4.3",
+    "@testing-library/react-native": "^7.1.0",
     "@types/jest": "^25.2.3",
     "@types/qs": "^6.9.5",
     "@types/react-native": "^0.63.2",
@@ -70,6 +72,16 @@
       "jsx",
       "json",
       "node"
+    ],
+    "setupFiles": [
+      "./node_modules/react-native-gesture-handler/jestSetup.js",
+      "./tests/setup.ts"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/mock.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|@react-native-community|@react-navigation)"
     ]
   }
 }
