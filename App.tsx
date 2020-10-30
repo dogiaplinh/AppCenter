@@ -11,8 +11,9 @@ import { LogBox, StatusBar } from "react-native";
 import AppScreen from "./app/screens/AppScreen";
 import GridStatsScreen from "./app/screens/GridStatsScreen";
 import EventDetailsScreen from "./app/screens/EventDetailsScreen";
+import DiagnosticsScreen from "./app/screens/DiagnosticsScreen";
 
-LogBox.ignoreLogs(["Require cycle", "VirtualizedLists should never"]);
+LogBox.ignoreLogs(["Require cycle", "VirtualizedLists should never", "Non-serializable values"]);
 enableScreens();
 const Stack = createNativeStackNavigator();
 
@@ -28,6 +29,7 @@ const App = () => {
             <Stack.Screen name="App" component={AppScreen} />
             <Stack.Screen name="GridStats" component={GridStatsScreen} />
             <Stack.Screen name="EventDetails" component={EventDetailsScreen} />
+            <Stack.Screen name="Diagnostics" component={DiagnosticsScreen} />
           </>
         ) : (
           <>

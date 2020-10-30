@@ -16,4 +16,8 @@ export type StackParamList = {
     name: string;
     dateRange: DateRange;
   };
+  Diagnostics: {
+    app: AppItem;
+    dateRange: DateRange;
+  };
 };

@@ -102,3 +102,28 @@ export type SessionDurationsDistribution = {
   previous_average_duration: string;
   average_duration: string;
 };
+
+export type ErrorGroup = {
+  errorGroupId: string;
+  appVersion: string;
+  appBuild: string;
+  count: number;
+  deviceCount: number;
+  firstOccurrence: Date;
+  lastOccurrence: Date;
+  exceptionType: string;
+  exceptionMessage: string;
+  exceptionClassName: string;
+  exceptionClassMethod: boolean;
+  exceptionMethod: string;
+  exceptionAppCode: boolean;
+  exceptionFile: string;
+  exceptionLine: string;
+  codeRaw: string;
+  hidden: boolean;
+  state: string;
+};
+
+export type ErrorGroupsResult = {
+  errorGroups: ErrorGroup[];
+};

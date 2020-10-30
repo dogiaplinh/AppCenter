@@ -84,6 +84,9 @@ const AppScreen = ({ navigation, route }: Props) => {
   const goPlacesStats = useCallback(() => {
     navigation.push("GridStats", { title: "Places", type: "place", app, dateRange });
   }, [dateRange]);
+  const goDiagnostics = useCallback(() => {
+    navigation.push("Diagnostics", { app, dateRange });
+  }, [dateRange]);
   return (
     <View style={{ flex: 1 }}>
       <Appbar.Header>
@@ -151,6 +154,10 @@ const AppScreen = ({ navigation, route }: Props) => {
               ))}
             </DataTable>
           </Card.Content>
+        </Card>
+
+        <Card style={styles.card} onPress={goDiagnostics}>
+          <Card.Title title="Diagnostics" />
         </Card>
 
         <View style={{ height: 16 }} />

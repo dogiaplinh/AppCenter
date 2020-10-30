@@ -9,26 +9,29 @@ type Props = {
   onChangeVersion?: (versions: string) => any;
   onChangeTime?: (dateRange: DateRange) => any;
 };
-type DateRangeItems = { label: string; value: DateRange }[];
+type DateRangeItem = { label: string; range: DateRange; value: string };
 const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
   const now = currentDay();
   const versionValues = useMemo(
     () => [{ label: "All", value: "" }, ...(versions || []).map((x) => ({ label: x, value: x }))],
     [versions],
   );
-  const dateRages = useMemo<DateRangeItems>(() => {
-    const output: DateRangeItems = [
+  const dateRages = useMemo<DateRangeItem[]>(() => {
+    const output: DateRangeItem[] = [
       {
         label: "Last 7 days",
-        value: { start: dateBefore(now, 7), end: now },
+        value: "last7",
+        range: { start: dateBefore(now, 7), end: now },
       },
       {
         label: "Last 14 days",
-        value: { start: dateBefore(now, 14), end: now },
+        value: "last14",
+        range: { start: dateBefore(now, 14), end: now },
       },
       {
         label: "Last 28 days",
-        value: { start: dateBefore(now, 28), end: now },
+        value: "last28",
+        range: { start: dateBefore(now, 28), end: now },
       },
     ];
     return output;
@@ -51,8 +54,9 @@ const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
         style={{ width: 150, marginLeft: 16 }}
         itemStyle={{ justifyContent: "flex-start" }}
         onChangeItem={(item) => {
-          onChangeTime?.(item.value);
+          onChangeTime?.(item.range);
         }}
+        defaultValue="last7"
         containerStyle={{ height: 40 }}
       />
     </View>
