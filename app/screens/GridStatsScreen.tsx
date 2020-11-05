@@ -40,6 +40,25 @@ async function getData(
   return result;
 }
 
+function trending(value: number, previous?: number) {
+  if (previous === 0)
+    return <Text style={{ width: 80, textAlign: "right", color: "green" }}>{">500%▲"}</Text>;
+  if (!previous) return <Text style={{ width: 80 }}></Text>;
+  let sb = "";
+  const diff = (Math.abs(value - previous) / previous) * 100;
+  if (diff > 500) sb += ">500.0%";
+  else sb += `${diff.toFixed(1)}%`;
+  let color: string | undefined = undefined;
+  if (value > previous) {
+    sb += "▲";
+    color = "green";
+  } else if (value < previous) {
+    sb += "▼";
+    color = "red";
+  } else sb = "=";
+  return <Text style={{ width: 80, textAlign: "right", color }}>{sb}</Text>;
+}
+
 type Props = {
   navigation: StackNavigationProp<StackParamList, "GridStats">;
   route: RouteProp<StackParamList, "GridStats">;
@@ -97,9 +116,10 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={{ paddingVertical: 4 }}>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text>{labelFormatter?.(item.key) || item.key}</Text>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={{ flex: 1 }}>{labelFormatter?.(item.key) || item.key}</Text>
                 <Text>{item.count}</Text>
+                {trending(item.count, item.previousCount)}
               </View>
               <ProgressBar
                 progress={item.count / maxValue}
