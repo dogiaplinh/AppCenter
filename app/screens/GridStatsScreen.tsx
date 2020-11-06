@@ -49,12 +49,16 @@ const GridStatsScreen = ({ navigation, route }: Props) => {
   const [data, setData] = useState<CountsResult | undefined>(undefined);
   const [hasMore, setHasMore] = useState(true);
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const data = await getData(app, type, {
         ...dateRange,
       });
-      setData(data);
+      if (isMounted) setData(data);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
   const loadMoreCallback = useCallback(() => {
     if (!data) return;

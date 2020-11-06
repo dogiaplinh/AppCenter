@@ -16,14 +16,18 @@ const AppListScreen = ({ navigation }: Props) => {
   const [apps, setApps] = useState<AppItem[] | undefined>([]);
   const dispatch = useDispatch();
   useEffect(() => {
+    let isMounted = true;
     if (!apiClient.token) {
       const state = store.getState();
       apiClient.setToken(state.user?.apiToken);
     }
     (async () => {
       const data = await apiClient.getApps();
-      setApps(data);
+      if (isMounted) setApps(data);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
   const logoutCallback = useCallback(() => {
     dispatch(setApiToken(undefined));

@@ -1,19 +1,22 @@
 import React, { memo, useMemo, useState } from "react";
 import { View, Text } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { DateRange } from "../models/Models";
-import { currentDay, dateBefore } from "../utils/DateUtils";
+import { DateRange, PrebuiltDateRange } from "../models/Models";
+import { currentDay, dateBefore, makeDateRange } from "../utils/DateUtils";
 
 type Props = {
   versions?: string[];
   onChangeVersion?: (versions: string) => any;
   onChangeTime?: (dateRange: DateRange) => any;
 };
-type DateRangeItem = { label: string; range: DateRange; value: string };
+type DateRangeItem = { label: string; range: DateRange; value: PrebuiltDateRange };
 const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
   const now = currentDay();
   const versionValues = useMemo(
-    () => [{ label: "All", value: "" }, ...(versions || []).map((x) => ({ label: x, value: x }))],
+    () => [
+      { label: "All", value: "" },
+      ...(versions || []).reverse().map((x) => ({ label: x, value: x })),
+    ],
     [versions],
   );
   const dateRages = useMemo<DateRangeItem[]>(() => {
@@ -21,17 +24,17 @@ const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
       {
         label: "Last 7 days",
         value: "last7",
-        range: { start: dateBefore(now, 7), end: now },
+        range: makeDateRange("last7", now),
       },
       {
         label: "Last 14 days",
         value: "last14",
-        range: { start: dateBefore(now, 14), end: now },
+        range: makeDateRange("last14", now),
       },
       {
-        label: "Last 28 days",
-        value: "last28",
-        range: { start: dateBefore(now, 28), end: now },
+        label: "Last 30 days",
+        value: "last30",
+        range: makeDateRange("last30", now),
       },
     ];
     return output;

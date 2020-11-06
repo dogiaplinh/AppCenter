@@ -17,12 +17,16 @@ const DiagnosticsScreen = ({ navigation, route }: Props) => {
   const now = currentDay();
   const [errorGroups, setErrorGroups] = useState<ErrorGroup[]>([]);
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const errorGroups = await apiClient.getErrorGroups(app.owner.name, app.name, {
         ...dateRange,
       });
-      setErrorGroups(errorGroups?.errorGroups || []);
+      if (isMounted) setErrorGroups(errorGroups?.errorGroups || []);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [now]);
   return (
     <View style={{ flex: 1 }}>

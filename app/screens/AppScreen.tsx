@@ -37,41 +37,61 @@ const AppScreen = ({ navigation, route }: Props) => {
     end: now,
   });
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const versionList = await apiClient.getVersions(app.owner.name, app.name, {
         ...dateRange,
       });
-      setVersions(versionList);
+      if (isMounted) setVersions(versionList);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [now, dateRange]);
+
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const activeDeviceCounts = await apiClient.getActiveDeviceCounts(app.owner.name, app.name, {
         ...dateRange,
         version: filteredVersion,
       });
-      setActiveDevices(activeDeviceCounts);
+      if (isMounted) setActiveDevices(activeDeviceCounts);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [now, filteredVersion, dateRange]);
+
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const eventsResult = await apiClient.getEventsSummary(app.owner.name, app.name, {
         ...dateRange,
         version: filteredVersion,
       });
-      setEventsResult(eventsResult);
+      if (isMounted) setEventsResult(eventsResult);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [now, filteredVersion, dateRange]);
+
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const eventsResult = await apiClient.getSessionDurationsDistribution(
         app.owner.name,
         app.name,
         { ...dateRange, version: filteredVersion },
       );
-      setDurationsDistribution(eventsResult);
+      if (isMounted) setDurationsDistribution(eventsResult);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [now, filteredVersion, dateRange]);
+
   const goModelStats = useCallback(() => {
     navigation.push("GridStats", { title: "Models", type: "model", app, dateRange });
   }, [dateRange]);
@@ -87,6 +107,7 @@ const AppScreen = ({ navigation, route }: Props) => {
   const goDiagnostics = useCallback(() => {
     navigation.push("Diagnostics", { app, dateRange });
   }, [dateRange]);
+
   return (
     <View style={{ flex: 1 }}>
       <Appbar.Header>

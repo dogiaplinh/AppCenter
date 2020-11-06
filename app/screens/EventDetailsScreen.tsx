@@ -18,22 +18,31 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
   const [deviceCounts, setDeviceCounts] = useState<EventDeviceCountResult | undefined>(undefined);
   const [properties, setProperties] = useState<Record<string, CountsResult>>({});
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const result = await apiClient.getEventCount(app.owner.name, app.name, eventName, {
         ...dateRange,
       });
-      setEventCounts(result);
+      if (isMounted) setEventCounts(result);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const result = await apiClient.getEventDeviceCount(app.owner.name, app.name, eventName, {
         ...dateRange,
       });
-      setDeviceCounts(result);
+      if (isMounted) setDeviceCounts(result);
     })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
   useEffect(() => {
+    let isMounted = true;
     (async () => {
       const properties = await apiClient.getEventProperties(app.owner.name, app.name, eventName);
       if (properties) {
@@ -48,9 +57,12 @@ const EventDetailsScreen = ({ navigation, route }: Props) => {
           );
           if (result) output[prop] = result;
         }
-        setProperties(output);
+        if (isMounted) setProperties(output);
       }
     })();
+    return () => {
+      isMounted = false;
+    };
   }, []);
   return (
     <View style={{ flex: 1 }}>
