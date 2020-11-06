@@ -1,4 +1,4 @@
-package com.appcenter;
+package linh.appcenter;
 
 import com.facebook.react.ReactActivity;
 import android.os.Bundle;
