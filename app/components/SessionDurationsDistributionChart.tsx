@@ -28,11 +28,7 @@ const SessionDurationsDistributionChart = ({ distribution, style }: Props) => {
           xAccessor={({ item, index }) => index}
           formatLabel={(value, index) => distribution.distribution[index].key}
           style={{ minHeight: 50 }}
-          svg={{
-            fill: "black",
-            rotation: 55,
-            textAnchor: "start",
-          }}
+          svg={{ fill: "black", rotation: 55, textAnchor: "start" }}
         />
       </Card.Content>
     </Card>

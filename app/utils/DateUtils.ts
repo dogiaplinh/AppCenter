@@ -44,6 +44,12 @@ export function makeDateRange(range: PrebuiltDateRange, now: Date): DateRange {
         start: dateBefore(now, 90),
         end: now,
       };
+
+    case "this_month":
+      return {
+        start: new Date(now.getFullYear(), now.getMonth(), 1),
+        end: now,
+      };
   }
   return { start: now, end: now };
 }

@@ -1,6 +1,6 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { memo, useCallback, useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Appbar, Card } from "react-native-paper";
 import apiClient from "../utils/ApiClient";
 import { AppItem } from "../models/ApiModels";
@@ -34,6 +34,7 @@ const AppListScreen = ({ navigation }: Props) => {
   }, []);
   return (
     <View>
+      <StatusBar barStyle="light-content" />
       <Appbar.Header>
         <Appbar.Content title="Apps" />
         <Appbar.Action icon="logout" onPress={logoutCallback} testID="logoutButton" />

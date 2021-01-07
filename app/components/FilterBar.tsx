@@ -1,8 +1,10 @@
 import React, { memo, useMemo, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { DateRange, PrebuiltDateRange } from "../models/Models";
 import { currentDay, dateBefore, makeDateRange } from "../utils/DateUtils";
+import RNPickerSelect from "react-native-picker-select";
+import { Card } from "react-native-paper";
 
 type Props = {
   versions?: string[];
@@ -14,7 +16,7 @@ const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
   const now = currentDay();
   const versionValues = useMemo(
     () => [
-      { label: "All", value: "" },
+      { label: "All versions", value: "" },
       ...(versions || []).reverse().map((x) => ({ label: x, value: x })),
     ],
     [versions],
@@ -36,34 +38,47 @@ const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
         value: "last30",
         range: makeDateRange("last30", now),
       },
+      {
+        label: "This month",
+        value: "this_month",
+        range: makeDateRange("this_month", now),
+      },
     ];
     return output;
   }, [now]);
   return (
-    <View style={{ marginHorizontal: 16, marginVertical: 8, flexDirection: "row" }}>
-      <DropDownPicker
-        items={versionValues}
-        placeholder="Version"
-        style={{ width: 120 }}
-        onChangeItem={(item) => {
-          onChangeVersion?.(item.value);
-        }}
-        itemStyle={{ justifyContent: "flex-start" }}
-        containerStyle={{ height: 40 }}
-      />
-      <DropDownPicker
-        items={dateRages}
-        placeholder="Time"
-        style={{ width: 150, marginLeft: 16 }}
-        itemStyle={{ justifyContent: "flex-start" }}
-        onChangeItem={(item) => {
-          onChangeTime?.(item.range);
-        }}
-        defaultValue="last7"
-        containerStyle={{ height: 40 }}
-      />
+    <View style={{ marginHorizontal: 8, marginVertical: 8, flexDirection: "row" }}>
+      <Card style={styles.card}>
+        <Card.Content style={styles.cardContent}>
+          <RNPickerSelect
+            pickerProps={{ mode: "dropdown" }}
+            onValueChange={(value) => onChangeVersion?.(value)}
+            items={versionValues}
+            placeholder={{}}
+          />
+        </Card.Content>
+      </Card>
+      <Card style={styles.card}>
+        <Card.Content style={styles.cardContent}>
+          <RNPickerSelect
+            onValueChange={(_, index) => onChangeTime?.(dateRages[index].range)}
+            items={dateRages}
+            placeholder={{}}
+          />
+        </Card.Content>
+      </Card>
     </View>
   );
 };
 
 export default memo(FilterBar);
+
+const styles = StyleSheet.create({
+  card: {
+    marginLeft: 8,
+  },
+  cardContent: {
+    width: 125,
+    paddingVertical: 8,
+  },
+});
