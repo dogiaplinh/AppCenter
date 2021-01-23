@@ -1,10 +1,10 @@
 import React, { memo, useMemo, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { DateRange, PrebuiltDateRange } from "../models/Models";
 import { currentDay, dateBefore, makeDateRange } from "../utils/DateUtils";
 import RNPickerSelect from "react-native-picker-select";
 import { Card } from "react-native-paper";
+import { Constants } from "../assets";
 
 type Props = {
   versions?: string[];
@@ -61,6 +61,7 @@ const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
       <Card style={styles.card}>
         <Card.Content style={styles.cardContent}>
           <RNPickerSelect
+            pickerProps={{ mode: "dropdown" }}
             onValueChange={(_, index) => onChangeTime?.(dateRages[index].range)}
             items={dateRages}
             placeholder={{}}
@@ -73,12 +74,14 @@ const FilterBar = ({ versions, onChangeVersion, onChangeTime }: Props) => {
 
 export default memo(FilterBar);
 
+const isAndroid = Platform.OS === "android";
 const styles = StyleSheet.create({
   card: {
     marginLeft: 8,
   },
   cardContent: {
-    width: 125,
-    paddingVertical: 8,
+    width: isAndroid ? 170 : 125,
+    paddingVertical: isAndroid ? 0 : 8,
+    paddingHorizontal: isAndroid ? 8 : undefined,
   },
 });
